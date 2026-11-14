@@ -67,13 +67,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private val Ink = Color(0xFFFFE45C) // DuckCall yellow: primary text
-private val Teal = Color(0xFF2563EB) // Electric blue: actions and highlights
-private val Mint = Color(0xFF172B55) // Deep blue surface accent
-private val Muted = Color(0xFFB8B18A) // Muted warm text
-private val Canvas = Color(0xFF050608) // Near-black app background
+// DuckCall signature theme: midnight black, signal yellow, electric blue, and call red.
+private val Ink = Color(0xFFFFE45C) // Signal yellow typography
+private val Teal = Color(0xFF2563EB) // Electric blue actions and highlights
+private val Mint = Color(0xFF172B55) // Deep blue accent surface
+private val Muted = Color(0xFFB8B18A) // Muted warm secondary text
+private val Canvas = Color(0xFF050608) // Midnight black app background
 private val Panel = Color(0xFF11151D) // Raised dark surface
 private val DividerColor = Color(0xFF293247)
+private val CallRed = Color(0xFFDC2626) // Call-end accent
 
 class MainActivity : ComponentActivity() {
     private var incomingDialNumber by mutableStateOf("")
@@ -179,7 +181,7 @@ private fun DuckCallApp(initialNumber: String, onRequestDefaultDialer: () -> Uni
     var showDialpad by remember { mutableStateOf(preferences.getBoolean("show_dialpad", true)) }
     var showSearch by remember { mutableStateOf(preferences.getBoolean("show_search", false)) }
     var navigationPosition by remember { mutableStateOf(preferences.getString("navigation_position", "bottom") ?: "bottom") }
-    var accentColor by remember { mutableStateOf("blue") }
+    var accentColor by remember { mutableStateOf(preferences.getString("accent_color", "blue") ?: "blue") }
     var callButtonOrder by remember { mutableStateOf(preferences.getString("call_button_order", "cellular_first") ?: "cellular_first") }
     var inCallButtonOrder by remember { mutableStateOf(preferences.getString("in_call_button_order", "mute_speaker_hold") ?: "mute_speaker_hold") }
     var showInCallDialpad by remember { mutableStateOf(preferences.getBoolean("in_call_dialpad_enabled", true)) }
@@ -557,7 +559,7 @@ private fun SettingsScreen(
         ChoiceSetting("Navigation position", navigationPosition.replaceFirstChar { it.uppercase() }) {
             onNavigationPositionChange(if (navigationPosition == "bottom") "top" else "bottom")
         }
-        SettingRow("DuckCall color scheme", "Midnight black · Signal yellow · Electric blue", "Default")
+        SettingRow("DuckCall signature theme", "Midnight black · Signal yellow · Electric blue · Call red", "Default")
         Spacer(Modifier.height(18.dp))
         Text("IN-CALL CONTROLS", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Teal, letterSpacing = 1.2.sp)
         ToggleSetting("Mute button", "Show the mute control during calls", muteControlEnabled, onMuteControlChange)
