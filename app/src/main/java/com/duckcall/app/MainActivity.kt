@@ -377,6 +377,18 @@ private fun DialerScreen(
         Spacer(Modifier.height(12.dp))
         val context = LocalContext.current
         val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        val pastePhoneNumber = {
+            val clip = clipboard.primaryClip
+            val rawText = if (clip != null && clip.itemCount > 0) {
+                clip.getItemAt(0).coerceToText(context)?.toString().orEmpty()
+            } else ""
+            val phoneText = rawText.filter { it.isDigit() || it in "+*#(),; -" }.trim()
+            if (phoneText.any { it.isDigit() }) {
+                onNumberChange(phoneText)
+            } else {
+                Toast.makeText(context, "Copy a phone number first, then tap Paste", Toast.LENGTH_SHORT).show()
+            }
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -385,8 +397,8 @@ private fun DialerScreen(
             OutlinedTextField(
                 value = number,
                 onValueChange = onNumberChange,
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Enter phone number", color = Muted) },
+                modifier = Modifier.weight(1f).clickable { pastePhoneNumber() },
+                placeholder = { Text("Tap Paste or this field to insert a copied number", color = Muted) },
                 singleLine = true,
                 textStyle = MaterialTheme.typography.headlineSmall.copy(textAlign = TextAlign.Center, color = Ink),
                 readOnly = true,
@@ -398,19 +410,7 @@ private fun DialerScreen(
                 }
             )
             Button(
-                onClick = {
-                    val clip = clipboard.primaryClip
-                    val pasted = if (clip != null && clip.itemCount > 0) {
-                        clip.getItemAt(0).text?.toString()
-                            ?: clip.getItemAt(0).coerceToText(context)?.toString().orEmpty()
-                    } else ""
-                    val phoneText = pasted.filter { it.isDigit() || it in "+*#(),; -" }.trim()
-                    if (phoneText.any { it.isDigit() }) {
-                        onNumberChange(phoneText)
-                    } else {
-                        Toast.makeText(context, "Copy a phone number first, then tap Paste", Toast.LENGTH_SHORT).show()
-                    }
-                },
+                onClick = { pastePhoneNumber() },
                 colors = ButtonDefaults.buttonColors(containerColor = Teal, contentColor = Color.White),
                 shape = RoundedCornerShape(14.dp)
             ) {
