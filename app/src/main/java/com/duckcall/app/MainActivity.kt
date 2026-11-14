@@ -67,38 +67,38 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// DuckCall signature theme: midnight black, signal yellow, electric blue, and call red.
-private val Ink = Color(0xFFFFE45C) // Signal yellow typography
+// DuckDialer signature theme: midnight black, signal orange, electric blue, and call red.
+private val Ink = Color(0xFFFF922B) // Signal orange typography
 private val Teal = Color(0xFF2563EB) // Electric blue actions and highlights
 private val Mint = Color(0xFF172B55) // Deep blue accent surface
-private val Muted = Color(0xFFB8B18A) // Muted warm secondary text
+private val Muted = Color(0xFFB8A18C) // Muted warm secondary text
 private val Canvas = Color(0xFF050608) // Midnight black app background
 private val Panel = Color(0xFF11151D) // Raised dark surface
 private val DividerColor = Color(0xFF293247)
-private val CallRed = Color(0xFFDC2626) // Call-end accent
+private val CallRed = Color(0xFFEF4444) // Call-end accent
 
 class MainActivity : ComponentActivity() {
     private var incomingDialNumber by mutableStateOf("")
     private val notificationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
     private val callPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (!granted) {
-            Toast.makeText(this, "Phone permission is needed to place cellular calls from DuckCall", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Phone permission is needed to place cellular calls from DuckDialer", Toast.LENGTH_LONG).show()
         } else {
             requestNotificationPermissionIfNeeded()
         }
     }
     private val roleRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (isDefaultDialer()) {
-            Toast.makeText(this, "DuckCall is now your default phone app", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "DuckDialer is now your default phone app", Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this, "DuckCall was not selected as the default phone app", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "DuckDialer was not selected as the default phone app", Toast.LENGTH_LONG).show()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         incomingDialNumber = intent?.data?.schemeSpecificPart.orEmpty()
-        setContent { DuckCallApp(initialNumber = incomingDialNumber, onRequestDefaultDialer = { requestDefaultDialer() }) }
+        setContent { DuckDialerApp(initialNumber = incomingDialNumber, onRequestDefaultDialer = { requestDefaultDialer() }) }
         if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             callPermissionRequest.launch(Manifest.permission.CALL_PHONE)
         } else {
@@ -145,7 +145,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun DuckCallApp(initialNumber: String, onRequestDefaultDialer: () -> Unit) {
+private fun DuckDialerApp(initialNumber: String, onRequestDefaultDialer: () -> Unit) {
     var selectedTab by rememberSaveable { mutableStateOf("Dialer") }
     var phoneNumber by rememberSaveable { mutableStateOf(initialNumber) }
     LaunchedEffect(initialNumber) { if (initialNumber.isNotBlank()) phoneNumber = initialNumber }
@@ -220,7 +220,7 @@ private fun DuckCallApp(initialNumber: String, onRequestDefaultDialer: () -> Uni
                         }
                         Spacer(Modifier.width(12.dp))
                         Column {
-                            Text("DuckCall", fontSize = 23.sp, fontWeight = FontWeight.Bold, color = Ink)
+                            Text("DuckDialer", fontSize = 23.sp, fontWeight = FontWeight.Bold, color = Ink)
                             if (mainScreenStyle != "minimal") Text("A clearer way to connect", fontSize = 12.sp, color = Muted)
                         }
                         Spacer(Modifier.weight(1f))
@@ -271,7 +271,7 @@ private fun DuckCallApp(initialNumber: String, onRequestDefaultDialer: () -> Uni
                                             .putInt("calls_made_today", callsMadeToday)
                                             .apply()
                                     } catch (_: Exception) {
-                                        Toast.makeText(context, "DuckCall could not place this call", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context, "DuckDialer could not place this call", Toast.LENGTH_LONG).show()
                                     }
                                 }
                             }
@@ -321,7 +321,7 @@ private fun DuckCallApp(initialNumber: String, onRequestDefaultDialer: () -> Uni
                 title = { Text("Set up internet calling") },
                 text = {
                     Text(
-                        "The VoIP calling screen is planned, but real internet calls need a calling provider or DuckCall server. Once we choose one, we can add sign-in, audio, incoming calls, and call notifications."
+                        "The VoIP calling screen is planned, but real internet calls need a calling provider or DuckDialer server. Once we choose one, we can add sign-in, audio, incoming calls, and call notifications."
                     )
                 },
                 confirmButton = {
@@ -463,7 +463,7 @@ private fun DialerScreen(
             ) { Text("☎  Cellular", fontWeight = FontWeight.SemiBold) }
         }
         Spacer(Modifier.height(8.dp))
-        Text("Calls are handled by Android Telecom when DuckCall is the default phone app.", fontSize = 11.sp, color = Muted)
+        Text("Calls are handled by Android Telecom when DuckDialer is the default phone app.", fontSize = 11.sp, color = Muted)
     }
 }
 
@@ -474,7 +474,7 @@ private fun RecentsScreen(recents: List<String>) {
         Text("Your latest calls from this session", fontSize = 13.sp, color = Muted)
         Spacer(Modifier.height(18.dp))
         if (recents.isEmpty()) {
-            EmptyState("◷", "No calls yet", "Numbers you dial from DuckCall will appear here.")
+            EmptyState("◷", "No calls yet", "Numbers you dial from DuckDialer will appear here.")
         } else {
             recents.forEach { number ->
                 Row(
@@ -510,7 +510,7 @@ private fun FavoritesScreen() {
 private fun ContactsScreen() {
     Column(Modifier.fillMaxWidth().padding(22.dp)) {
         Text("Contacts", fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Ink)
-        Text("People you'll reach from DuckCall", fontSize = 13.sp, color = Muted)
+        Text("People you'll reach from DuckDialer", fontSize = 13.sp, color = Muted)
         Spacer(Modifier.height(22.dp))
         EmptyState("♙", "Your people, one tap away", "Contact access is not enabled yet. We'll add a permission-safe contact picker next.")
     }
@@ -540,12 +540,12 @@ private fun SettingsScreen(
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 22.dp, vertical = 16.dp)) {
         TextButton(onClick = onBack, modifier = Modifier.align(Alignment.Start)) { Text("← Back", color = Teal, fontWeight = FontWeight.SemiBold) }
         Text("Settings", fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Ink)
-        Text("Control what appears and how DuckCall works", fontSize = 13.sp, color = Muted)
+        Text("Control what appears and how DuckDialer works", fontSize = 13.sp, color = Muted)
         Spacer(Modifier.height(18.dp))
         Text("CALLING", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Teal, letterSpacing = 1.2.sp)
         ToggleSetting("Cellular calling", "Show and enable carrier calls", cellularEnabled, onCellularChange)
         ToggleSetting("Internet calling", "Show the internet call option (provider setup still required)", internetEnabled, onInternetChange)
-        Button(onClick = onRequestDefaultDialer, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) { Text("Set DuckCall as default phone app") }
+        Button(onClick = onRequestDefaultDialer, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) { Text("Set DuckDialer as default phone app") }
         Spacer(Modifier.height(18.dp))
         Text("NAVIGATION", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Teal, letterSpacing = 1.2.sp)
         ToggleSetting("Favorites", "Show the Favorites tab", favoritesEnabled, onFavoritesChange)
@@ -559,7 +559,7 @@ private fun SettingsScreen(
         ChoiceSetting("Navigation position", navigationPosition.replaceFirstChar { it.uppercase() }) {
             onNavigationPositionChange(if (navigationPosition == "bottom") "top" else "bottom")
         }
-        SettingRow("DuckCall signature theme", "Midnight black · Signal yellow · Electric blue · Call red", "Default")
+        SettingRow("DuckDialer signature theme", "Midnight black · Signal orange · Electric blue · Call red", "Default")
         Spacer(Modifier.height(18.dp))
         Text("IN-CALL CONTROLS", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Teal, letterSpacing = 1.2.sp)
         ToggleSetting("Mute button", "Show the mute control during calls", muteControlEnabled, onMuteControlChange)
@@ -580,7 +580,7 @@ private fun SettingsScreen(
         }
         Spacer(Modifier.height(18.dp))
         Text("MORE", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Teal, letterSpacing = 1.2.sp)
-        SettingRow("App version", "DuckCall 0.1.0", "Test build")
+        SettingRow("App version", "DuckDialer 0.1.0", "Test build")
         Button(onClick = onVoipSetup, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) { Text("Configure internet calling") }
     }
 }
