@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "DuckCall"
+rootProject.name = "DuckDialer"
 include(":app")
