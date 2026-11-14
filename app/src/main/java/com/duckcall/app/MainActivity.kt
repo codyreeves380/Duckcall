@@ -372,34 +372,51 @@ private fun DialerScreen(
                 Text("Keypad", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Ink)
                 Text("Enter a number to call", fontSize = 13.sp, color = Muted)
             }
-            val context = LocalContext.current
-            val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            TextButton(onClick = {
-                val pasted = clipboard.primaryClip?.takeIf { it.itemCount > 0 }
-                    ?.getItemAt(0)?.coerceToText(context)?.toString().orEmpty()
-                val phoneText = pasted.filter { it.isDigit() || it in "+*#(),; -" }
-                if (phoneText.isNotBlank()) onNumberChange(phoneText)
-                else Toast.makeText(context, "No phone number found on clipboard", Toast.LENGTH_SHORT).show()
-            }) {
-                Text("Paste", color = Teal, fontWeight = FontWeight.SemiBold)
-            }
+
         }
         Spacer(Modifier.height(12.dp))
-        OutlinedTextField(
-            value = number,
-            onValueChange = onNumberChange,
+        val context = LocalContext.current
+        val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Enter phone number", color = Muted) },
-            singleLine = true,
-            textStyle = MaterialTheme.typography.headlineSmall.copy(textAlign = TextAlign.Center, color = Ink),
-            readOnly = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            trailingIcon = {
-                if (number.isNotEmpty()) {
-                    TextButton(onClick = { onNumberChange(number.dropLast(1)) }) { Text("⌫", fontSize = 20.sp, color = Teal) }
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = number,
+                onValueChange = onNumberChange,
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Enter phone number", color = Muted) },
+                singleLine = true,
+                textStyle = MaterialTheme.typography.headlineSmall.copy(textAlign = TextAlign.Center, color = Ink),
+                readOnly = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                trailingIcon = {
+                    if (number.isNotEmpty()) {
+                        TextButton(onClick = { onNumberChange(number.dropLast(1)) }) { Text("⌫", fontSize = 20.sp, color = Teal) }
+                    }
                 }
+            )
+            Button(
+                onClick = {
+                    val clip = clipboard.primaryClip
+                    val pasted = if (clip != null && clip.itemCount > 0) {
+                        clip.getItemAt(0).text?.toString()
+                            ?: clip.getItemAt(0).coerceToText(context)?.toString().orEmpty()
+                    } else ""
+                    val phoneText = pasted.filter { it.isDigit() || it in "+*#(),; -" }.trim()
+                    if (phoneText.any { it.isDigit() }) {
+                        onNumberChange(phoneText)
+                    } else {
+                        Toast.makeText(context, "Copy a phone number first, then tap Paste", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Teal, contentColor = Color.White),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Text("Paste", fontWeight = FontWeight.Bold)
             }
-        )
+        }
         Spacer(Modifier.height(10.dp))
         ToggleSetting(
             "Hide my caller ID",
