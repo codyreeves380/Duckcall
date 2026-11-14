@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +58,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
@@ -216,7 +218,7 @@ private fun DuckDialerApp(initialNumber: String, onRequestDefaultDialer: () -> U
                                 .background(Mint, CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("🦆", fontSize = 23.sp)
+                            Image(painter = painterResource(id = R.drawable.ic_launcher_foreground), contentDescription = "DuckDialer duck and phone logo", modifier = Modifier.size(38.dp))
                         }
                         Spacer(Modifier.width(12.dp))
                         Column {
